@@ -1,180 +1,154 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Happy New Year</title>
-
-    <style>
-        :root{
-            --bg1:#0b1226;
-            --bg2:#0d1b3a;
-            --accent:#ffd166;
-            --muted:rgba(255,255,255,0.75);
-        }
-
-        html,body{
-            height:100%;
-            margin:0;
-            font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-        }
-
-        body{
-            background:
-                radial-gradient(1200px 700px at 10% 10%, rgba(255,209,102,0.06), transparent),
-                linear-gradient(135deg,var(--bg1),var(--bg2));
-            color:white;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            text-align:center;
-            overflow:hidden;
-        }
-
-        canvas{
-            position:fixed;
-            inset:0;
-            z-index:1;
-            pointer-events:none;
-        }
-
-        .card{
-            position:relative;
-            z-index:2;
-            max-width:900px;
-            background:rgba(255,255,255,0.03);
-            border-radius:16px;
-            padding:40px;
-            border:1px solid rgba(255,255,255,0.05);
-            box-shadow:0 10px 40px rgba(0,0,0,.5);
-        }
-
-        h1{margin:0 0 10px}
-        .lead{color:var(--muted)}
-
-        .countdown{
-            display:flex;
-            gap:16px;
-            justify-content:center;
-            margin:20px 0;
-            flex-wrap:wrap;
-        }
-
-        .unit{
-            padding:12px 16px;
-            border-radius:10px;
-            background:rgba(255,255,255,0.02);
-            min-width:80px;
-        }
-
-        .num{
-            font-size:1.6rem;
-            font-weight:700;
-            color:var(--accent);
-        }
-
-        button{
-            padding:10px 16px;
-            border-radius:10px;
-            border:none;
-            cursor:pointer;
-            font-weight:700;
-            margin:5px;
-        }
-
-        button.primary{
-            background:#ffd166;
-            color:#09203b;
-        }
-
-        button.secondary{
-            background:transparent;
-            color:white;
-            border:1px solid rgba(255,255,255,0.2);
-        }
-    </style>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>New Year Countdown & Fireworks</title>
+	<style>
+		html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+		canvas{position:fixed;inset:0;display:block;z-index:1}
+		.overlay{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:2rem}
+		h1{font-size:clamp(1.5rem,5vw,3.5rem);margin:0 0 .5rem;color:#ffea00;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+		#count{font-size:clamp(1rem,4vw,2.2rem);background:rgba(0,0,0,0.25);padding:.6rem 1rem;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.6)}
+		.sub{margin-top:1rem;color:#ffd;opacity:.9}
+		.hidden{display:none}
+	</style>
 </head>
-
 <body>
-<canvas id="fx"></canvas>
+	<canvas id="fireworks"></canvas>
+	<div class="overlay">
+		<h1 id="title">Countdown to the New Year</h1>
+		<div id="count">-- : -- : -- : --</div>
+		<div class="sub">Days &nbsp;&nbsp; Hours &nbsp;&nbsp; Minutes &nbsp;&nbsp; Seconds</div>
+	</div>
 
-<div class="card" aria-live="polite">
-    <h1 id="greeting">Happy New Year</h1>
-    <p class="lead" id="sub">Counting down to the new year...</p>
+	<script>
+		// Countdown target: next Jan 1st at 00:00:00
+		function getNextNewYear(){
+			const now = new Date();
+			return new Date(now.getFullYear()+1,0,1,0,0,0);
+		}
 
-    <div class="countdown">
-        <div class="unit"><div class="num" id="days">0</div>Days</div>
-        <div class="unit"><div class="num" id="hours">00</div>Hours</div>
-        <div class="unit"><div class="num" id="minutes">00</div>Minutes</div>
-        <div class="unit"><div class="num" id="seconds">00</div>Seconds</div>
-    </div>
+		const target = getNextNewYear();
+		const countEl = document.getElementById('count');
+		const titleEl = document.getElementById('title');
 
-    <button class="primary" id="launch">Launch Fireworks</button>
-    <button class="secondary" id="toggle">Toggle Auto</button>
-</div>
+		function pad(n){return n.toString().padStart(2,'0')}
+		function updateCountdown(){
+			const now = new Date();
+			let diff = Math.max(0, target - now);
+			if(diff <= 0){
+				countEl.textContent = '00 : 00 : 00 : 00';
+				titleEl.textContent = 'Happy New Year!';
+				bigBurst();
+				return;
+			}
+			const s = Math.floor(diff/1000)%60;
+			const m = Math.floor(diff/60000)%60;
+			const h = Math.floor(diff/3600000)%24;
+			const d = Math.floor(diff/86400000);
+			countEl.textContent = pad(d)+' : '+pad(h)+' : '+pad(m)+' : '+pad(s);
+		}
+		setInterval(updateCountdown, 250);
+		updateCountdown();
 
-<script>
-const canvas = document.getElementById("fx");
-const ctx = canvas.getContext("2d");
-let W = canvas.width = innerWidth;
-let H = canvas.height = innerHeight;
+		// Fireworks canvas
+		const canvas = document.getElementById('fireworks');
+		const ctx = canvas.getContext('2d');
+		let W = canvas.width = innerWidth;
+		let H = canvas.height = innerHeight;
 
-addEventListener("resize", () => {
-    W = canvas.width = innerWidth;
-    H = canvas.height = innerHeight;
-});
+		window.addEventListener('resize',()=>{W=canvas.width=innerWidth;H=canvas.height=innerHeight});
 
-function nextYear(){
-    const now = new Date();
-    return new Date(now.getFullYear()+1,0,1);
-}
+		const particles = [];
 
-const target = nextYear();
-const ids = ["days","hours","minutes","seconds"].map(id=>document.getElementById(id));
-const greeting = document.getElementById("greeting");
-const sub = document.getElementById("sub");
+		function rand(min,max){return Math.random()*(max-min)+min}
+		function hsl(h,s,l){return 'hsl('+h+','+s+'%,'+l+'%)'}
 
-setInterval(()=>{
-    const now = new Date();
-    let d = Math.max(0,target-now);
+		class Particle{
+			constructor(x,y, vx, vy, color, life){
+				this.x = x; this.y = y; this.vx = vx; this.vy = vy; this.color = color; this.life = life; this.age = 0; this.size = rand(1.5,3.8);
+			}
+			update(dt){
+				this.vy += 0.035*dt; // gravity
+				this.x += this.vx*dt; this.y += this.vy*dt; this.age += dt;
+			}
+			get alive(){return this.age < this.life}
+			draw(ctx){
+				const t = 1 - this.age/this.life;
+				ctx.globalAlpha = Math.max(0, t);
+				ctx.fillStyle = this.color;
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.size * t, 0, Math.PI*2);
+				ctx.fill();
+			}
+		}
 
-    const days = Math.floor(d/86400000); d%=86400000;
-    const hrs = Math.floor(d/3600000); d%=3600000;
-    const mins = Math.floor(d/60000); d%=60000;
-    const secs = Math.floor(d/1000);
+		function burst(x,y,count,colorBase,spread,force,life){
+			for(let i=0;i<count;i++){
+				const angle = Math.random()*Math.PI*2;
+				const speed = rand(force*0.2, force);
+				const vx = Math.cos(angle)*speed;
+				const vy = Math.sin(angle)*speed;
+				const hue = (colorBase + rand(-20,20) + 360) % 360;
+				const color = hsl(hue, 100, rand(45,65));
+				particles.push(new Particle(x,y,vx,vy,color,life*rand(0.7,1.2)));
+			}
+		}
 
-    [days,hrs,mins,secs].forEach((v,i)=>ids[i].textContent=String(v).padStart(2,"0"));
+		function launch(){
+			// launch rocket from bottom with arc and explode
+			const sx = rand(W*0.15, W*0.85);
+			const tx = rand(W*0.15, W*0.85);
+			const peak = rand(H*0.15, H*0.5);
+			// simple rocket: animate upward movement then burst
+			const rocket = {x:sx,y:H+10, vx:(tx-sx)/120, vy: -rand(5.5,8.5), color:rand(0,360), life:0, explodeAt:rand(H*0.2,H*0.6)};
+			let steps = 0;
+			const rInterval = setInterval(()=>{
+				steps++;
+				rocket.x += rocket.vx;
+				rocket.y += rocket.vy* (1 - steps/400);
+				rocket.vy += 0.02;
+				// add trail
+				particles.push(new Particle(rocket.x, rocket.y, rand(-0.3,0.3), rand(-0.3,0.3), hsl(rocket.color,100,60), rand(12,18)));
+				if(rocket.y < rocket.explodeAt || steps>400){
+					clearInterval(rInterval);
+					burst(rocket.x, rocket.y, Math.floor(rand(20,80)), rocket.color, 120, rand(1.5,6), rand(0.8,2.2));
+				}
+			}, 16);
+		}
 
-    if(target-now<=0){
-        greeting.textContent="🎉 Happy New Year! 🎉";
-        sub.textContent="Enjoy the fireworks!";
-    }
-},1000);
+		// Big burst for midnight
+		function bigBurst(){
+			for(let i=0;i<10;i++){
+				setTimeout(()=>{
+					burst(rand(W*0.2,W*0.8), rand(H*0.15,H*0.45), 150, rand(0,360), 180, rand(2.5,7.5), rand(1.2,2.8));
+				}, i*250);
+			}
+		}
 
-// fireworks
-let rockets=[];
-function rand(a,b){return Math.random()*(b-a)+a;}
+		// periodic automatic launches
+		setInterval(()=>{ if(Math.random()<0.7) launch(); if(Math.random()<0.25) burst(rand(W*0.1,W*0.9), rand(H*0.05,H*0.6), Math.floor(rand(20,80)), rand(0,360), 90, rand(1.2,4.5), rand(0.8,2.2)); }, 900);
 
-function launch(x){
-    rockets.push({x,y:H,vy:rand(-6,-4)});
-}
+		// animation loop
+		let last = performance.now();
+		function loop(t){
+			const dt = Math.min(1/30, (t-last)/16); last = t;
+			ctx.clearRect(0,0,W,H);
+			// subtle background glow
+			ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(0,0,W,H);
 
-document.getElementById("launch").onclick=()=>launch(rand(0,W));
-
-function loop(){
-    ctx.fillStyle="rgba(0,0,0,.2)";
-    ctx.fillRect(0,0,W,H);
-
-    rockets.forEach(r=>{
-        r.y+=r.vy;
-        ctx.fillStyle="gold";
-        ctx.fillRect(r.x,r.y,3,3);
-    });
-
-    rockets=rockets.filter(r=>r.y>0);
-    requestAnimationFrame(loop);
-}
-loop();
-</script>
+			// update & draw particles
+			for(let i=particles.length-1;i>=0;i--){
+				const p = particles[i];
+				p.update(dt);
+				if(!p.alive){ particles.splice(i,1); continue }
+				p.draw(ctx);
+			}
+			ctx.globalAlpha = 1;
+			requestAnimationFrame(loop);
+		}
+		requestAnimationFrame(loop);
+	</script>
 </body>
 </html>
