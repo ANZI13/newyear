@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Happy New Year</title>
+
     <style>
         :root{
             --bg1:#0b1226;
@@ -11,372 +12,169 @@
             --accent:#ffd166;
             --muted:rgba(255,255,255,0.75);
         }
-        html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+
+        html,body{
+            height:100%;
+            margin:0;
+            font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+        }
+
         body{
-            background: radial-gradient(1200px 700px at 10% 10%, rgba(255,209,102,0.06), transparent),
-                                    linear-gradient(135deg,var(--bg1),var(--bg2));
+            background:
+                radial-gradient(1200px 700px at 10% 10%, rgba(255,209,102,0.06), transparent),
+                linear-gradient(135deg,var(--bg1),var(--bg2));
             color:white;
-            overflow:hidden;
             display:flex;
             align-items:center;
             justify-content:center;
             text-align:center;
-            -webkit-font-smoothing:antialiased;
-            -moz-osx-font-smoothing:grayscale;
-            padding:2rem;
+            overflow:hidden;
         }
 
-        .card{
-            position:relative;
-            z-index:5;
-            max-width:900px;
-            width:100%;
-            background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-            border:1px solid rgba(255,255,255,0.05);
-            border-radius:16px;
-            padding:40px;
-            box-shadow:0 10px 40px rgba(2,6,23,0.6);
-            backdrop-filter: blur(6px) saturate(120%);
-        }
-
-        h1{
-            margin:0 0 8px;
-            font-size:2.2rem;
-            letter-spacing:1px;
-        }
-        p.lead{
-            margin:0 0 20px;
-            color:var(--muted);
-            font-size:1rem;
-        }
-
-        .countdown{
-            display:flex;
-            gap:16px;
-            justify-content:center;
-            margin-bottom:20px;
-            flex-wrap:wrap;
-        }
-        .unit{
-            background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-            padding:12px 16px;
-            border-radius:10px;
-            border:1px solid rgba(255,255,255,0.04);
-            min-width:78px;
-        }
-        .unit .num{
-            font-weight:700;
-            font-size:1.6rem;
-            color:var(--accent);
-        }
-        .unit .lbl{
-            font-size:0.75rem;
-            color:var(--muted);
-            margin-top:6px;
-        }
-
-        .controls{
-            display:flex;
-            gap:10px;
-            justify-content:center;
-            margin-top:6px;
-            flex-wrap:wrap;
-        }
-        button{
-            appearance:none;
-            border:0;
-            padding:10px 16px;
-            border-radius:10px;
-            background:linear-gradient(180deg,#ffd166,#ffb703);
-            color:#09203b;
-            font-weight:700;
-            cursor:pointer;
-            box-shadow:0 6px 18px rgba(255,177,3,0.15);
-        }
-        button.secondary{
-            background:transparent;
-            color:var(--muted);
-            border:1px solid rgba(255,255,255,0.06);
-            box-shadow:none;
-        }
-
-        /* small note */
-        .note{margin-top:12px;color:rgba(255,255,255,0.55);font-size:0.85rem;}
-
-        /* canvas fills viewport behind UI */
-        canvas#fx{
+        canvas{
             position:fixed;
             inset:0;
             z-index:1;
             pointer-events:none;
         }
 
-        @media (max-width:520px){
-            h1{font-size:1.6rem}
-            .unit .num{font-size:1.2rem}
+        .card{
+            position:relative;
+            z-index:2;
+            max-width:900px;
+            background:rgba(255,255,255,0.03);
+            border-radius:16px;
+            padding:40px;
+            border:1px solid rgba(255,255,255,0.05);
+            box-shadow:0 10px 40px rgba(0,0,0,.5);
+        }
+
+        h1{margin:0 0 10px}
+        .lead{color:var(--muted)}
+
+        .countdown{
+            display:flex;
+            gap:16px;
+            justify-content:center;
+            margin:20px 0;
+            flex-wrap:wrap;
+        }
+
+        .unit{
+            padding:12px 16px;
+            border-radius:10px;
+            background:rgba(255,255,255,0.02);
+            min-width:80px;
+        }
+
+        .num{
+            font-size:1.6rem;
+            font-weight:700;
+            color:var(--accent);
+        }
+
+        button{
+            padding:10px 16px;
+            border-radius:10px;
+            border:none;
+            cursor:pointer;
+            font-weight:700;
+            margin:5px;
+        }
+
+        button.primary{
+            background:#ffd166;
+            color:#09203b;
+        }
+
+        button.secondary{
+            background:transparent;
+            color:white;
+            border:1px solid rgba(255,255,255,0.2);
         }
     </style>
 </head>
+
 <body>
-    <canvas id="fx"></canvas>
+<canvas id="fx"></canvas>
 
-    <div class="card" role="main" aria-live="polite">
-        <h1 id="greeting">Happy New Year</h1>
-        <p class="lead" id="sub">Counting down to the new year...</p>
+<div class="card" aria-live="polite">
+    <h1 id="greeting">Happy New Year</h1>
+    <p class="lead" id="sub">Counting down to the new year...</p>
 
-        <div class="countdown" aria-hidden="false">
-            <div class="unit"><div class="num" id="days">0</div><div class="lbl">Days</div></div>
-            <div class="unit"><div class="num" id="hours">00</div><div class="lbl">Hours</div></div>
-            <div class="unit"><div class="num" id="minutes">00</div><div class="lbl">Minutes</div></div>
-            <div class="unit"><div class="num" id="seconds">00</div><div class="lbl">Seconds</div></div>
-        </div>
-
-        <div class="controls">
-            <button id="toggleFire">Toggle Fireworks</button>
-            <button id="launch" class="secondary">Launch Now</button>
-            <button id="mute" class="secondary">Mute</button>
-        </div>
-
-        <div class="note">Click "Launch Now" or anywhere to trigger fireworks. Autolaunch near midnight.</div>
+    <div class="countdown">
+        <div class="unit"><div class="num" id="days">0</div>Days</div>
+        <div class="unit"><div class="num" id="hours">00</div>Hours</div>
+        <div class="unit"><div class="num" id="minutes">00</div>Minutes</div>
+        <div class="unit"><div class="num" id="seconds">00</div>Seconds</div>
     </div>
 
-    <script>
-        // Basic layout / utils
-        const canvas = document.getElementById('fx');
-        const ctx = canvas.getContext('2d', { alpha: true });
-        let W = canvas.width = innerWidth;
-        let H = canvas.height = innerHeight;
+    <button class="primary" id="launch">Launch Fireworks</button>
+    <button class="secondary" id="toggle">Toggle Auto</button>
+</div>
 
-        addEventListener('resize', ()=>{ W = canvas.width = innerWidth; H = canvas.height = innerHeight; });
+<script>
+const canvas = document.getElementById("fx");
+const ctx = canvas.getContext("2d");
+let W = canvas.width = innerWidth;
+let H = canvas.height = innerHeight;
 
-        // Countdown target: next Jan 1 local
-        function nextYearDate(){
-            const now = new Date();
-            const year = now.getFullYear() + (now.getMonth()===0 && now.getDate()===1 && now.getHours()===0 && now.getMinutes()===0 && now.getSeconds()===0 ? 0 : 1);
-            return new Date(year, 0, 1, 0, 0, 0, 0);
-        }
-        let target = nextYearDate();
+addEventListener("resize", () => {
+    W = canvas.width = innerWidth;
+    H = canvas.height = innerHeight;
+});
 
-        // DOM refs
-        const daysEl = document.getElementById('days');
-        const hoursEl = document.getElementById('hours');
-        const minutesEl = document.getElementById('minutes');
-        const secondsEl = document.getElementById('seconds');
-        const greeting = document.getElementById('greeting');
-        const sub = document.getElementById('sub');
+function nextYear(){
+    const now = new Date();
+    return new Date(now.getFullYear()+1,0,1);
+}
 
-        function updateCountdown(){
-            const now = new Date();
-            let diff = Math.max(0, target - now);
-            const d = Math.floor(diff / (1000*60*60*24));
-            diff -= d*(1000*60*60*24);
-            const h = Math.floor(diff / (1000*60*60));
-            diff -= h*(1000*60*60);
-            const m = Math.floor(diff / (1000*60));
-            diff -= m*(1000*60);
-            const s = Math.floor(diff / 1000);
+const target = nextYear();
+const ids = ["days","hours","minutes","seconds"].map(id=>document.getElementById(id));
+const greeting = document.getElementById("greeting");
+const sub = document.getElementById("sub");
 
-            daysEl.textContent = d;
-            hoursEl.textContent = String(h).padStart(2,'0');
-            minutesEl.textContent = String(m).padStart(2,'0');
-            secondsEl.textContent = String(s).padStart(2,'0');
+setInterval(()=>{
+    const now = new Date();
+    let d = Math.max(0,target-now);
 
-            // update label and auto-fire when time hits 0
-            if (target - now <= 0) {
-                greeting.textContent = "Happy New Year " + target.getFullYear() + "!";
-                sub.textContent = "Wishing you a joyful year ahead — enjoy the fireworks!";
-                startFireworks();
-            } else {
-                const yr = target.getFullYear();
-                sub.textContent = `Counting down to January 1, ${yr}`;
-            }
-        }
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
+    const days = Math.floor(d/86400000); d%=86400000;
+    const hrs = Math.floor(d/3600000); d%=3600000;
+    const mins = Math.floor(d/60000); d%=60000;
+    const secs = Math.floor(d/1000);
 
-        /* Simple fireworks / particles */
-        const rockets = [];
-        const particles = [];
-        let fireworksOn = true;
-        let muted = false;
+    [days,hrs,mins,secs].forEach((v,i)=>ids[i].textContent=String(v).padStart(2,"0"));
 
-        // simple sound using oscillator
-        function popSound(freq, time=0.06){
-            if (muted) return;
-            try{
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const o = ctx.createOscillator();
-                const g = ctx.createGain();
-                o.type = 'sine';
-                o.frequency.value = freq;
-                g.gain.value = 0.0001;
-                o.connect(g);
-                g.connect(ctx.destination);
-                o.start();
-                g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
-                g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + time);
-                o.stop(ctx.currentTime + time + 0.02);
-            }catch(e){}
-        }
+    if(target-now<=0){
+        greeting.textContent="🎉 Happy New Year! 🎉";
+        sub.textContent="Enjoy the fireworks!";
+    }
+},1000);
 
-        function random(min,max){ return Math.random()*(max-min)+min; }
+// fireworks
+let rockets=[];
+function rand(a,b){return Math.random()*(b-a)+a;}
 
-        class Rocket {
-            constructor(x,y,vx,vy,color){
-                this.x = x; this.y = y;
-                this.vx = vx; this.vy = vy;
-                this.age = 0; this.color = color || `hsl(${Math.random()*360},90%,60%)`;
-                this.exploded = false;
-            }
-            update(dt){
-                this.age += dt;
-                this.vy += 0.06*dt; // gravity
-                this.x += this.vx*dt*60;
-                this.y += this.vy*dt*60;
-                // explode condition: slow upward or high altitude
-                if(!this.exploded && (this.vy>0.8 || this.y < H*0.25 || this.age>1.8)){
-                    this.explode();
-                }
-            }
-            explode(){
-                this.exploded = true;
-                popSound(440+Math.random()*400,0.08);
-                const count = Math.floor(random(24,60));
-                for(let i=0;i<count;i++){
-                    const a = Math.PI*2*(i/count) + random(-0.3,0.3);
-                    const s = random(1.6,4.8);
-                    particles.push(new Particle(this.x, this.y, Math.cos(a)*s, Math.sin(a)*s, this.color));
-                }
-            }
-            draw(ctx){
-                ctx.beginPath();
-                ctx.fillStyle = this.color;
-                ctx.arc(this.x, this.y, 2.2, 0, Math.PI*2);
-                ctx.fill();
-            }
-        }
+function launch(x){
+    rockets.push({x,y:H,vy:rand(-6,-4)});
+}
 
-        class Particle {
-            constructor(x,y,vx,vy,color){
-                this.x = x; this.y = y;
-                this.vx = vx; this.vy = vy;
-                this.life = random(0.8,2.2);
-                this.age = 0;
-                this.color = color;
-                this.size = random(1.6,3.8);
-            }
-            update(dt){
-                this.age += dt;
-                this.vy += 0.06*dt;
-                this.vx *= 0.995;
-                this.vy *= 0.999;
-                this.x += this.vx*dt*60;
-                this.y += this.vy*dt*60;
-            }
-            draw(ctx){
-                const t = Math.max(0,1 - this.age/this.life);
-                ctx.globalAlpha = t;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.ellipse(this.x, this.y, this.size, this.size*0.7, 0, 0, Math.PI*2);
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-            isDead(){ return this.age > this.life || this.y > H + 30; }
-        }
+document.getElementById("launch").onclick=()=>launch(rand(0,W));
 
-        let last = performance.now();
-        function loop(now){
-            const dt = Math.min(0.04, (now - last)/1000);
-            last = now;
-            // fade background slightly
-            ctx.fillStyle = 'rgba(5,8,18,0.18)';
-            ctx.fillRect(0,0,W,H);
+function loop(){
+    ctx.fillStyle="rgba(0,0,0,.2)";
+    ctx.fillRect(0,0,W,H);
 
-            // maybe auto-launch rockets occasionally
-            if (fireworksOn && Math.random() < 0.03) launchRocket(random(W*0.1, W*0.9), H + 10, random(-0.6,0.6), random(-3.6,-4.8));
+    rockets.forEach(r=>{
+        r.y+=r.vy;
+        ctx.fillStyle="gold";
+        ctx.fillRect(r.x,r.y,3,3);
+    });
 
-            // update
-            for(let i=rockets.length-1;i>=0;i--){
-                rockets[i].update(dt);
-                rockets[i].draw(ctx);
-                if (rockets[i].exploded) rockets.splice(i,1);
-            }
-            for(let i=particles.length-1;i>=0;i--){
-                particles[i].update(dt);
-                particles[i].draw(ctx);
-                if (particles[i].isDead()) particles.splice(i,1);
-            }
-
-            requestAnimationFrame(loop);
-        }
-        requestAnimationFrame(loop);
-
-        function launchRocket(x,y,vx,vy,color){
-            rockets.push(new Rocket(x,y,vx,vy,color));
-        }
-
-        // user interactions
-        document.getElementById('launch').addEventListener('click', ()=> {
-            for(let i=0;i<3;i++){
-                const x = random(W*0.15, W*0.85);
-                launchRocket(x, H+10, random(-0.8,0.8), random(-4.2,-6.0), `hsl(${random(0,360)},90%,60%)`);
-            }
-        });
-
-        // click to launch at pointer
-        addEventListener('click', (e)=>{
-            // avoid clicks on buttons from spawning immediate rockets (but allow too)
-            const x = e.clientX || W/2;
-            const y = e.clientY || H/2;
-            launchRocket(x, H+10, (x-W/2)/200, random(-4.6,-5.8), `hsl(${random(0,360)},90%,60%)`);
-        });
-
-        // toggle fireworks
-        const toggleFire = document.getElementById('toggleFire');
-        toggleFire.addEventListener('click', ()=>{
-            fireworksOn = !fireworksOn;
-            toggleFire.textContent = fireworksOn ? 'Stop Fireworks' : 'Start Fireworks';
-        });
-
-        // mute toggle
-        document.getElementById('mute').addEventListener('click', (e)=>{
-            muted = !muted;
-            e.target.textContent = muted ? 'Unmute' : 'Mute';
-        });
-
-        // auto-launch when within last 10 seconds
-        let autoLaunched = false;
-        setInterval(()=>{
-            const now = new Date();
-            const diff = (target - now)/1000;
-            if (diff <= 10 && diff >= 0 && !autoLaunched){
-                // rapid bursts
-                for(let t=0;t<12;t++){
-                    setTimeout(()=> {
-                        const x = random(W*0.15, W*0.85);
-                        launchRocket(x, H+10, random(-0.8,0.8), random(-5.0,-7.0), `hsl(${random(0,360)},90%,60%)`);
-                    }, t*150);
-                }
-                autoLaunched = true;
-            }
-            // reset for next year
-            if (diff < -5){
-                target = nextYearDate();
-                autoLaunched = false;
-                greeting.textContent = "Happy New Year";
-            }
-        }, 500);
-
-        // small accessibility: announce when zero
-        const live = document.querySelector('[aria-live]');
-        const announce = (msg)=>{ if (live) live.textContent = msg; };
-
-        // update greeting when fireworks triggered
-        function startFireworks(){
-            fireworksOn = true;
-            announce("Happy New Year!");
-        }
-    </script>
+    rockets=rockets.filter(r=>r.y>0);
+    requestAnimationFrame(loop);
+}
+loop();
+</script>
 </body>
 </html>
